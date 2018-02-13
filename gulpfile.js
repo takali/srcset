@@ -1,9 +1,12 @@
 //SRCSET REQUIREMENTS
-var fs = require('fs');
-var path = require('path');
+var gulp    = require( 'gulp' );
+var fs      = require('fs');
+var path    = require('path');
 var cheerio = require('cheerio');
-var glob = require("glob");
-var im = require('imagemagick');
+var glob    = require("glob");
+var im      = require('imagemagick');
+var del     = require( 'del' );
+var gutil            = require( 'gulp-util' );
 
 ///////////////////
 // CONFIGURATION //
@@ -103,7 +106,7 @@ gulp.task( 'srcset', function() {
                   }
                   else
                   {
-                    //srcset mais pas de resize, on copie juste l'image
+                    //srcset detected but no resize needed, just copy image
                     gutil.log('SRCSET', gutil.colors.cyan('NOTHING TO RESIZE, JUST MV'), gutil.colors.magenta(baseSrc));
                     gulp.src(baseSrc).pipe(gulp.dest(srcsetOptions.targetDir));
                   }   
@@ -112,14 +115,14 @@ gulp.task( 'srcset', function() {
             }
             else
             {
-              //image source manquante
+              //image source missing
               gutil.log('SRCSET', gutil.colors.bgRed('RESIZE FAILED : SOURCE FILE DOES NOT EXISTS'), gutil.colors.magenta(baseSrc));
             }
           });
         }
         else
         {
-          //pas de srcset, on copie juste l'image
+          //no srcset detected, just copy image
 
           var imgSrc = $(this).attr('src');
           var baseSrc = imgSrc.replace('_'+getResizeValue(imgSrc), '');
@@ -143,3 +146,58 @@ gulp.task( 'srcset', function() {
   gutil.log('SRCSET', 'Total resized images', gutil.colors.magenta(imgResized));
   
 } );
+
+/****** SRCSET FUNCTIONS ******/
+
+//renvoi le filename sans extension
+function getImageWithoutExt(str)
+{
+  var ext = str.split('.').pop();
+  str = str.replace('.'+ext, '');
+  return str;
+}
+
+//renvoi le param de resize du filename
+function getResizeValue(str)
+{
+  str = getImageWithoutExt(str);
+  str = str.split('_').pop();
+  return str;
+}
+
+// resize images
+function resizeImages(source, dest, size, type)
+{
+  if(type > 0) // width base resize
+  {
+    im.resize({
+      srcPath: source,
+      dstPath: dest,
+      width:   size,
+      quality: srcsetOptions.imgQuality
+    }, function(err, stdout, stderr){
+      if (err) {
+        throw err;
+      }
+      gutil.log('SRCSET', gutil.colors.cyan(source)+' to', gutil.colors.magenta(dest), 'with a width of '+gutil.colors.yellow(size));
+      imgResized++;
+      // console.log('resized "'+source+'" to "'+dest+'" with a width of '+size);
+    });
+  }
+  else // width base resize
+  {
+    im.resize({
+      srcPath: source,
+      dstPath: dest,
+      height:   size,
+      quality: srcsetOptions.imgQuality
+    }, function(err, stdout, stderr){
+      if (err) {
+        throw err;
+      }
+      gutil.log('SRCSET', gutil.colors.cyan(source)+' to', gutil.colors.magenta(dest), 'with a height of '+gutil.colors.yellow(size));
+      imgResized++;
+      // console.log('resized "'+source+'" to "'+dest+'" with a height of '+size);
+    });
+  }
+}
