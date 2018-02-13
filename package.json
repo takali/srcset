@@ -1,0 +1,25 @@
+{
+  "name": "srcset",
+  "version": "1.0.0",
+  "description": "Javascript script for resize image based on data-srcset value",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/takali/srcset.git"
+  },
+  "keywords": [
+    "javascript",
+    "resize",
+    "image",
+    "srcset"
+  ],
+  "author": "takali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/takali/srcset/issues"
+  },
+  "homepage": "https://github.com/takali/srcset#readme"
+}
