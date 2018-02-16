@@ -6,7 +6,7 @@ var cheerio = require('cheerio');
 var glob    = require("glob");
 var im      = require('imagemagick');
 var del     = require( 'del' );
-var gutil            = require( 'gulp-util' );
+var gutil   = require( 'gulp-util' );
 
 ///////////////////
 // CONFIGURATION //
@@ -38,7 +38,11 @@ gulp.task( 'clean', function() {
 // Generate image with SRCSET attributes
 gulp.task( 'srcset', function() {
 
-  del.sync('tmp/*.jpg', 'tmp/*.png', 'tmp/*.gif', 'tmp/*.jpeg');
+  if (!fs.existsSync(paths.tmp)){
+    fs.mkdirSync(paths.tmp);
+  }
+  else
+    del.sync('tmp/*.jpg', 'tmp/*.png', 'tmp/*.gif', 'tmp/*.jpeg');
 
   // options is optional 
   glob("tpl/*.html", srcsetOptions.globOptions, function (er, files) {
@@ -143,7 +147,7 @@ gulp.task( 'srcset', function() {
     }
   });
 
-  gutil.log('SRCSET', 'Total resized images', gutil.colors.magenta(imgResized));
+  // gutil.log('SRCSET', 'Total resized images', gutil.colors.magenta(imgResized));
   
 } );
 
